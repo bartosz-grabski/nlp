@@ -1,4 +1,5 @@
 import sys
+import math
 
 class CorpusBuilder(object):
 
@@ -13,7 +14,7 @@ class CorpusBuilder(object):
 			'finish': [ 'finnish.txt', 'finnish1.txt'],
 			'italian': [ 'q.txt','54.txt' ],
 			'polish': [ 'polski.txt', 'polski2.txt','polski3.txt'],
-			'spanish': [ 'spanish.txt','spanish1.txt'],
+			'spanish': [ 'spanish.txt','spanish1.txt']
 		}
 		self.lang_dict = {}
 
@@ -28,7 +29,7 @@ class CorpusBuilder(object):
 					contents = f.read().lower().strip().split()
 					self.ngrams = zip(*[contents[i:] for i in xrange(self.n)])
 					for ngram in self.ngrams:
-						ngram_string = " ".join(ngram)
+						ngram_string = "###".join(ngram)
 						if ngram_string in self.lang_dict[lang]:
 							self.lang_dict[lang][ngram_string] += 1
 						else:
@@ -46,14 +47,14 @@ class LanguageIdentifier(object):
 	def identify_language(self,text):
 		contents = text.lower().strip().split()
 		ngrams = zip(*[contents[i:] for i in xrange(self.n)])
-		ngram_strings = map(lambda x: " ".join(x),ngrams)
+		ngram_strings = map(lambda x: "###".join(x),ngrams)
 
 		scores = [ ] 
 
 		for lang in self.lang_dict:
-			scores.append((reduce(lambda x,y: x*y, map(lambda x: self.lang_dict[lang][x],filter(lambda x: x in self.lang_dict[lang],ngram_strings)),1.0),lang))
+			scores.append((reduce(lambda x,y: x+y, map(lambda x: self.lang_dict[lang][x],filter(lambda x: x in self.lang_dict[lang],ngram_strings)),0.0),lang))
 			
-		highest = sorted(scores,key=lambda x: x[0])
+		highest = sorted(scores,key=lambda x: -x[0])
 		print highest[0]
 
 
