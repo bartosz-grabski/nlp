@@ -1,0 +1,3 @@
+zle:złe
+gura:góra
+dzifne:dziwne

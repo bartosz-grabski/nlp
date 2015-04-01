@@ -1,10 +1,6 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys
-
-
-
-
-
 
 class LevenshteinDistance(object):
 
@@ -25,10 +21,11 @@ class LevenshteinDistance(object):
 			'om':u'ą'
 		}
 		self.ortographical_errors_single = {
-			'u':u'ó'
+			'u':u'ó',
+			'w':u'f'
 		}
 		self.cost = 1
-		self.cost_diacritics = 0.5
+		self.cost_diacritics = 0.9
 		self.cost_transposition = 1
 		self.cost_ortographical = 0.75
 
@@ -72,16 +69,17 @@ class LevenshteinDistance(object):
 						d[i-1][j-1]+self._check_diacritics(str1[i-1],str2[j-1]),
 						d[i-1][j-1]+self._check_single_ortographical_error(str1[i-1],str2[j-1])
 					)
-				if i > 2 and j > 0:
+				if i > 1 and j > 0:
 					d[i][j] = min(
 						d[i][j],
 						d[i-2][j-1]+self._check_double_ortographical_error(str1[i-2:i],str2[j-1])	
 					)
-				if j > 2 and i > 0:
+				if j > 1 and i > 0:
 					d[i][j] = min(
 						d[i][j],
 						d[i-1][j-2]+self._check_double_ortographical_error(str2[j-2:j],str1[i-1])
 					)
+
 					
 
 		return d[len(str1)][len(str2)]
@@ -144,14 +142,32 @@ class DamerauLevenshteinDistance(LevenshteinDistance):
 		for j in xrange(len(str2)+1):
 			d[0][j] = j
 
+		cost = self.cost
+
 		for j in xrange(1,len(str2)+1):
 			for i in xrange(1,len(str1)+1):
 				if str1[i-1] == str2[j-1]:
 					d[i][j] = d[i-1][j-1]
 				else:
-					d[i][j] = min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+1)
-					if i > 1 and j > 1 and str1[i-2] == str2[j-1] and str2[j-2] == str1[i-1]:
-						d[i][j] = min(d[i][j],d[i-2][j-2]+1) 
+					d[i][j] = min(
+						d[i-1][j]+cost,
+						d[i][j-1]+cost,
+						d[i-1][j-1]+self._check_diacritics(str1[i-1],str2[j-1]),
+						d[i-1][j-1]+self._check_single_ortographical_error(str1[i-1],str2[j-1])
+					)
+				if i > 1 and j > 0:
+					d[i][j] = min(
+						d[i][j],
+						d[i-2][j-1]+self._check_double_ortographical_error(str1[i-2:i],str2[j-1])	
+					)
+				if j > 1 and i > 0:
+					d[i][j] = min(
+						d[i][j],
+						d[i-1][j-2]+self._check_double_ortographical_error(str2[j-2:j],str1[i-1])
+					)
+				
+				if i > 1 and j > 1 and str1[i-2] == str2[j-1] and str2[j-2] == str1[i-1]:
+					d[i][j] = min(d[i][j],d[i-2][j-2]+1) 
 
 
 		return d[len(str1)][len(str2)]
@@ -162,5 +178,5 @@ if __name__ == '__main__':
 	s1 = unicode(sys.argv[1],"utf-8")
 	s2 = unicode(sys.argv[2],"utf-8")
 	#print distance.check(s1,s2)
-	print distance.check_iterative(s1,s2)
-	#print distance.check_damerau_iterative(s1,s2)
+	#print distance.check_iterative(s1,s2)
+	print distance.check_damerau_iterative(s1,s2)
