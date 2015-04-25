@@ -21,8 +21,8 @@ class ZipfMandelbrot():
 			else:
 				base_forms[split[0]] = split[0]
 
-		f = codecs.open(text_corpus_file, encoding="utf-8").read()
-		text = re.sub(u'[^a-zA-Z0-9ąęćńółżźĄĘĆŃÓŁŻŹ]+', " ", f)
+		f = codecs.open(text_corpus_file, encoding="utf-8").read().lower()
+		text = re.sub(u'[^a-zA-Z0-9ąęćńółżź]+', " ", f)
 		split = text.split()
 		stats = collections.defaultdict(lambda : 0)
 		for el in split:
