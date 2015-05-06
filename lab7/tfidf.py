@@ -69,8 +69,8 @@ def find_matching_by_words(tfidf, base_forms, words, document_count, df, doc_len
 	words = words.split()
 	words = map(lambda x: base_forms[x] if x in base_forms else x, words)
 	words = collections.Counter(words)
-	max_value_doc_id = -1
 	max_value = 0.0
+	docs = collections.deque(maxlen=10)
 	for doc_id in xrange(1,document_count+1):
 		value = 0.0
 		squared_weights = 0.0
@@ -82,9 +82,9 @@ def find_matching_by_words(tfidf, base_forms, words, document_count, df, doc_len
 		value /= math.sqrt(doc_lengths_squared[doc_id])*math.sqrt(squared_weights)
 		if value > max_value:
 			max_value = value
-			max_value_doc_id = doc_id
+			docs.append((doc_id, value))
 
-	return (max_value_doc_id, max_value)
+	return list(docs)
 
 
 def find_similar_doc(tfidf, chosen_doc_id, doc_lengths_squared):
@@ -94,7 +94,7 @@ def find_similar_doc(tfidf, chosen_doc_id, doc_lengths_squared):
 		if tfidf[term][chosen_doc_id] > 0.0:
 			words.append(term)
 	max_value = 0.0
-	max_value_doc_id = -1
+	docs = collections.deque(maxlen=10)
 	doc_squared_length = doc_lengths_squared[chosen_doc_id]
 	for doc_id in xrange(1,document_count+1):
 		if doc_id != chosen_doc_id:
@@ -105,9 +105,9 @@ def find_similar_doc(tfidf, chosen_doc_id, doc_lengths_squared):
 			value /= math.sqrt(doc_lengths_squared[doc_id])*math.sqrt(doc_squared_length)
 			if value > max_value:
 				max_value = value
-				max_value_doc_id = doc_id
+				docs.append(doc_id)
 
-	return (max_value_doc_id, max_value)
+	return list(docs)
 
 if __name__ == "__main__":
 	if (len(sys.argv) < 3):
