@@ -16,28 +16,19 @@ def process_base_forms(base_forms_file):
 
 	return base_forms
 
-def create_tfidf_dict(base_forms,text_corpora_file):
+def process_docs(base_forms,text_corpora_file):
 	file_split = re.split(r'#[0-9]{6}',codecs.open(text_corpora_file, encoding="utf-8").read().lower());
-	tf = collections.defaultdict(lambda : collections.defaultdict(lambda: 0))
-	df = collections.defaultdict(lambda: 0)
-	doc_lengths_squared = collections.defaultdict(lambda: 0)
-	tfidf = collections.defaultdict(lambda : collections.defaultdict(lambda: 0))
-	document_count = 0
-	doc_id = 0;
-	for doc in file_split:
-		if doc != "":
-			doc_id += 1
-			document_count += 1
-			words = re.sub(r'[,.]','',doc)
-			words = re.sub(r'[ ]{2}',' ',words)
-			words = words.split()
-			words = map(lambda x: base_forms[x] if x in base_forms else x, words)
-			words = collections.Counter(words)
-			for word in words:
-				tf[word][doc_id] += words[word]
-				df[word] += 1
+	
+	def process_words(doc):
+		words = re.sub(r'[,.]','',doc)
+		words = re.sub(r'[ ]{2}',' ',words)
+		words = words.split()
+		words = map(lambda x: base_forms[x] if x in base_forms else x, words)
 
-	document_count -= 1
+	documents = [ process_words(doc) for doc in file_split if doc != "" ]
+
+	print documents			
+
 
 	for term in tf:
 		for doc in tf[term]:
