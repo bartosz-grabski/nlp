@@ -87,8 +87,12 @@ def find_similar(documents_ids, n, graph):
 
 
 if __name__ == "__main__":
-	graph = process_documents(sys.argv[1], sys.argv[2], int(sys.argv[3]))
-	sim = find_similar(sys.argv[5:], int(sys.argv[4]), graph)
-	print sim
+	docs = [ x for x in xrange(1000,1010)]
+		
+	for k in xrange(4):
+		print "####",k,"####"
+		graph = process_documents(sys.argv[1], sys.argv[2],k)
+		sim = find_similar(docs, 10, graph)
+		print sim
 
 	
